@@ -22,6 +22,19 @@ def ball_animation():
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x*=-1 #reversing the x speed
 
+#player animation function declaration and definition
+def player_animation():
+    #adding player speed to player rectangle
+    player.y+=player_speed
+
+    #avoid the player from moving outside the window
+    #teleporting the player bar by such small numbers that it looks like there is no movement at all
+    if player.top<=0:
+        player.top=0
+    if player.bottom>=screen_height:
+        player.bottom=screen_height
+
+
 #1. general setup 
 #these lines are important for the general setup
 # pygame.init() initiates all the pygame modules and is required to run any pygame code
@@ -52,6 +65,8 @@ light_grey=(200,200,200)
 ball_speed_x=7
 ball_speed_y=7
 
+#delcaring a player speed variable
+player_speed=0
 #3. loop
 #this loop will check if the user has pressed the close button at the top of the window
 #this  while loop is for updating the game
@@ -64,10 +79,29 @@ while True:
             #both of these commands combined close the game reliably
             pygame.quit() #uninitialyze the pygame module
             sys.exit() #will close the entire program
-       
-    #setup animation call inside the loop
-    ball_animation()
 
+        #13. checking the arrow key's input/event for controlling bar movement
+        #this statement will only check if ANY of the keys on the keyboard was pressed
+        if event.type == pygame.KEYDOWN:
+            #we need another if statement to check for which key was pressed specificlly
+            if event.key== pygame.K_DOWN: #down arrow key is called K_DOWN it was pressed 
+                #now we will specify what will happen when we press the down key
+                #14. now adding player movement logic
+                player_speed+=2
+            if event.key==pygame.K_UP:
+                player_speed-=2
+            #now for when the key is released
+            if event.type==pygame.KEYUP:
+                #we will reverse the player movement logic
+                if event.key== pygame.K_DOWN: 
+                    player_speed-=2
+                if event.key==pygame.K_UP:
+                    player_speed+=2
+       
+    #animation call inside the loop
+    ball_animation()
+    player_animation()
+   
     #7. filling the background color and making the line in the middle
     #both of these things dont require a rect object 
     #filling the whole display screen
