@@ -1,5 +1,26 @@
 # 2 parts of the game. one setup part and one loop. setup has logic and data. loop gives movement
-import pygame, sys
+import pygame, sys, random
+
+#15. restarting the game when the ball hits the left or the right boundary
+def restart_game():
+    global ball_speed_x,ball_speed_y
+    #teleporint the center of the ball to the middle 
+    ball.center=(screen_width/2,screen_height/2)
+    #also need to change the dorection in which the ball starts moving again or else it will always start in one same direction
+    ball_speed_x *=random.choice((1,-1))
+    ball_speed_y *=random.choice((1,-1))
+
+
+#14.2. opponent movement logic
+def opponent_ai():
+    if opponent.top<ball.y:
+        opponent.top+=opponent_speed
+    if opponent.bottom>ball.y:
+        opponent.bottom-=opponent_speed
+    if opponent.top<=0:
+        opponent.top=0
+    if opponent.bottom>=screen_height:
+        opponent.bottom=screen_height
 
 #12. defining the function for animation to keep the setup and the looop seperate
 def ball_animation():
@@ -14,9 +35,10 @@ def ball_animation():
     #this is for the y axis
     if ball.top <=0 or ball.bottom >= screen_height:
         ball_speed_y *= -1 #reversing th e ball speed
-    #this is for the x axi
+    #this is for the x axis  if the ball hits the left or right boundary
     if ball.left<=0 or ball.right>=screen_width:
-        ball_speed_x*=-1
+        #ball_speed_x*=-1 --> this thing was used before when we wanted to reverse the speed only instead of restarting the game
+        restart_game()
     
     #11. checking for collision with the player bars
     if ball.colliderect(player) or ball.colliderect(opponent):
@@ -62,11 +84,15 @@ bg_color=pygame.Color('grey12')
 light_grey=(200,200,200)
 
 #8. adding animation --> adding speed variables
-ball_speed_x=7
-ball_speed_y=7
+ball_speed_x=7 * random.choice((1,-1))
+ball_speed_y=7 * random.choice((1,-1))
 
 #delcaring a player speed variable
 player_speed=0
+
+#declaring the opponent speed
+opponent_speed=7
+
 #3. loop
 #this loop will check if the user has pressed the close button at the top of the window
 #this  while loop is for updating the game
@@ -87,20 +113,22 @@ while True:
             if event.key== pygame.K_DOWN: #down arrow key is called K_DOWN it was pressed 
                 #now we will specify what will happen when we press the down key
                 #14. now adding player movement logic
-                player_speed+=2
+                player_speed+=7
             if event.key==pygame.K_UP:
-                player_speed-=2
+                player_speed-=7
             #now for when the key is released
-            if event.type==pygame.KEYUP:
-                #we will reverse the player movement logic
-                if event.key== pygame.K_DOWN: 
-                    player_speed-=2
-                if event.key==pygame.K_UP:
-                    player_speed+=2
+        if event.type==pygame.KEYUP:
+            #we will reverse the player movement logic
+            if event.key== pygame.K_DOWN: 
+                player_speed-=7
+            if event.key==pygame.K_UP:
+                 player_speed+=7
        
     #animation call inside the loop
     ball_animation()
     player_animation()
+    #14. opponent movement with respect to the ball
+    opponent_ai()
    
     #7. filling the background color and making the line in the middle
     #both of these things dont require a rect object 
