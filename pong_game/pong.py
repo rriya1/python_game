@@ -75,9 +75,9 @@ pygame.display.set_caption('Pong')
 #this function gives the width and the height of the rectangle with its x and y positions.
 #x and y positions are at the top left corner of a rectangle and origin of the window is at top left corner of display surface.
 #thse 3 are empty rectangles for now. to draw them we will use a loop and pygame.draw()
-ball= pygame.Rect(screen_width/2-15,screen_height/2-15,30,30)#ball is 30x30 in dimensions with positioned at the center
-player=pygame.Rect(screen_width-20,screen_height/2-70,10,140)#10x140 pixel rectangle at the right middle of the screen
-opponent= pygame.Rect(10,screen_height/2-70,10,140)#rectangle for opponent
+ball= pygame.Rect(screen_width/2-10,screen_height/2-10,20,20)#ball is 30x30 in dimensions with positioned at the center
+player=pygame.Rect(screen_width-10,screen_height/2-50,10,100)#10x140 pixel rectangle at the right middle of the screen
+opponent= pygame.Rect(10,screen_height/2-50,10,100)#rectangle for opponent
 #defining color using color object
 bg_color=pygame.Color('grey12')
 #defining color usig a tuple
