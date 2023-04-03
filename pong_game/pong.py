@@ -1,6 +1,7 @@
 # 2 parts of the game. one setup part and one loop. setup has logic and data. loop gives movement
 import pygame, sys, random
-
+player_score=0
+opponent_score=0
 #15. restarting the game when the ball hits the left or the right boundary
 def restart_game():
     global ball_speed_x,ball_speed_y
@@ -12,7 +13,7 @@ def restart_game():
 
 
 #14.2. opponent movement logic
-def opponent_ai():
+def opponent_ai(): 
     if opponent.top<ball.y:
         opponent.top+=opponent_speed
     if opponent.bottom>ball.y:
@@ -25,7 +26,7 @@ def opponent_ai():
 #12. defining the function for animation to keep the setup and the looop seperate
 def ball_animation():
     #making the x and y sppeds global as the ball_spped_x and y inside the function is different from the one initianalized outside the function
-    global ball_speed_x,ball_speed_y
+    global ball_speed_x,ball_speed_y,player_score,opponent_score
 
     #9. animation--> incrementing the positions using the ball speed variables
     ball.x +=ball_speed_x
@@ -36,9 +37,14 @@ def ball_animation():
     if ball.top <=0 or ball.bottom >= screen_height:
         ball_speed_y *= -1 #reversing th e ball speed
     #this is for the x axis  if the ball hits the left or right boundary
-    if ball.left<=0 or ball.right>=screen_width:
+    if ball.left<=0:
+         player_score += 1
+         restart_game()
+       
+    if ball.right>=screen_width:
         #ball_speed_x*=-1 --> this thing was used before when we wanted to reverse the speed only instead of restarting the game
         restart_game()
+        opponent_score += 1 #16. updating the game score
     
     #11. checking for collision with the player bars
     if ball.colliderect(player) or ball.colliderect(opponent):
@@ -84,14 +90,14 @@ bg_color=pygame.Color('grey12')
 light_grey=(200,200,200)
 
 #8. adding animation --> adding speed variables
-ball_speed_x=7 * random.choice((1,-1))
-ball_speed_y=7 * random.choice((1,-1))
+ball_speed_x=4 * random.choice((1,-1))
+ball_speed_y=4 * random.choice((1,-1))
 
 #delcaring a player speed variable
 player_speed=0
 
 #declaring the opponent speed
-opponent_speed=7
+opponent_speed=4
 
 #3. loop
 #this loop will check if the user has pressed the close button at the top of the window
@@ -113,23 +119,30 @@ while True:
             if event.key== pygame.K_DOWN: #down arrow key is called K_DOWN it was pressed 
                 #now we will specify what will happen when we press the down key
                 #14. now adding player movement logic
-                player_speed+=7
+                player_speed+=4
             if event.key==pygame.K_UP:
-                player_speed-=7
+                player_speed-=4
             #now for when the key is released
         if event.type==pygame.KEYUP:
             #we will reverse the player movement logic
             if event.key== pygame.K_DOWN: 
-                player_speed-=7
+                player_speed-=4
             if event.key==pygame.K_UP:
-                 player_speed+=7
-       
+                 player_speed+=4
+
+    #game logic   
     #animation call inside the loop
     ball_animation()
     player_animation()
     #14. opponent movement with respect to the ball
     opponent_ai()
+    #game logic end
+
+    #15.text variables
    
+    game_text= pygame.font.Font("freesansbold.ttf", 15)
+
+    #viulas 
     #7. filling the background color and making the line in the middle
     #both of these things dont require a rect object 
     #filling the whole display screen
@@ -137,12 +150,21 @@ while True:
     #making the middle line
     pygame.draw.aaline(screen,light_grey,(screen_width/2,0),(screen_width/2,screen_height))#anti alias line, needs the surface to draw on, the color and the tuple of the start point and the tuple of the end point
 
-    #6. visulas
+    #6.  shape visulas
     #drawing the shapes using a loop
     pygame.draw.rect(screen,light_grey,player)#drawing player rectangle on the display screen of color light_grey
     pygame.draw.rect(screen,light_grey,opponent)
     #using pygame.draw.ellipse() instead if filling a rectangle like pygame.draw.rect() this draws an ellips form the given wireframe
     pygame.draw.ellipse(screen,light_grey,ball) #ball has dimensions 30x30 so sllipse becomes a circle
+
+    #16. making the surface for the text
+    #for the player
+    player_text= game_text.render(f"{player_score}",False,light_grey)
+    #putting that surface on our main display surface
+    screen.blit(player_text,(327,230))
+    #for the opponent
+    opponent_text= game_text.render(f"{opponent_score}",False,light_grey)
+    screen.blit(opponent_text,(308,230))
 
     #4. updating the window
     pygame.display.flip() #draw picture from everything that came before the loop, will drawa black screen for now
