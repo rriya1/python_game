@@ -2,16 +2,45 @@
 import pygame, sys, random
 player_score=0
 opponent_score=0
+
+#17 timer variables
+score_time= None 
+
+
 #15. restarting the game when the ball hits the left or the right boundary
 def restart_game():
-    global ball_speed_x,ball_speed_y
-    #teleporint the center of the ball to the middle 
-    ball.center=(screen_width/2,screen_height/2)
-    #also need to change the dorection in which the ball starts moving again or else it will always start in one same direction
-    ball_speed_x *=random.choice((1,-1))
-    ball_speed_y *=random.choice((1,-1))
+    global ball_speed_x,ball_speed_y, score_time
+    #17.3 we want to measure the current time and aslo we want to ensure that everything runes only after 3 seconds of restrting the game
+    #putting the ball at the center of the scrren
+    #teleporint the center of the ball to the middle
+    ball.center=(screen_width/2,screen_height/2-25)
+    # we also wanna ensure that we change the score_time back to None or else the condition ill always be true
+    current_time= pygame.time.get_ticks() #this will keep running again and again
+    
+    #18. adding timer for 3 2 1 text
+    if current_time-score_time<1000:
+        number3= game_text.render("3",False,light_grey)
+        screen.blit(number3,(screen_width/2-4,screen_height/2+3))
+    if current_time-score_time>1000 and current_time-score_time<2000:
+        number2= game_text.render("2",False,light_grey)
+        screen.blit(number2,(screen_width/2-4,screen_height/2+3))
+    if current_time-score_time>2000 and current_time-score_time<3000:
+        number1= game_text.render("1",False,light_grey)
+        screen.blit(number1,(screen_width/2-4,screen_height/2+3))
+        
+    #timer, when the time is less than the specified time then the ball wont move
+    if current_time-score_time<3000:
+        ball_speed_x,ball_speed_y=0,0
+    else:
+        #also need to change the dorection in which the ball starts moving again or else it will always start in one same direction
+        ball_speed_x = 4*random.choice((1,-1))
+        ball_speed_y = 4*random.choice((1,-1))
+        #setting the score time to none so that function does not run again
+        score_time=None
 
+    
 
+  
 #14.2. opponent movement logic
 def opponent_ai(): 
     if opponent.top<ball.y:
@@ -26,7 +55,7 @@ def opponent_ai():
 #12. defining the function for animation to keep the setup and the looop seperate
 def ball_animation():
     #making the x and y sppeds global as the ball_spped_x and y inside the function is different from the one initianalized outside the function
-    global ball_speed_x,ball_speed_y,player_score,opponent_score
+    global ball_speed_x,ball_speed_y,player_score,opponent_score, score_time
 
     #9. animation--> incrementing the positions using the ball speed variables
     ball.x +=ball_speed_x
@@ -39,13 +68,15 @@ def ball_animation():
     #this is for the x axis  if the ball hits the left or right boundary
     if ball.left<=0:
          player_score += 1
-         restart_game()
+         #restart_game()
+         score_time= pygame.time.get_ticks() #this will tell hpw long it has been since the game got started, this wll be point 1 whch only checks the time once.
        
     if ball.right>=screen_width:
         #ball_speed_x*=-1 --> this thing was used before when we wanted to reverse the speed only instead of restarting the game
-        restart_game()
+        ##restart_game() #getting rid of the resart function from here so that it dosent get called just once, but gets called multiple times because we want to measure current time 
         opponent_score += 1 #16. updating the game score
-    
+        score_time= pygame.time.get_ticks()
+
     #11. checking for collision with the player bars
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x*=-1 #reversing the x speed
@@ -98,6 +129,9 @@ player_speed=0
 
 #declaring the opponent speed
 opponent_speed=4
+
+
+# we want to get the time whenever someone scores because thats when the person needs to start the timer, aftre this moment we need to halt for 3 seconds
 
 #3. loop
 #this loop will check if the user has pressed the close button at the top of the window
@@ -157,6 +191,9 @@ while True:
     #using pygame.draw.ellipse() instead if filling a rectangle like pygame.draw.rect() this draws an ellips form the given wireframe
     pygame.draw.ellipse(screen,light_grey,ball) #ball has dimensions 30x30 so sllipse becomes a circle
 
+    #17.2 adding the restrt_game() function. it will run only when the condition of score_time is satisfird
+    if score_time:
+        restart_game()
     #16. making the surface for the text
     #for the player
     player_text= game_text.render(f"{player_score}",False,light_grey)
