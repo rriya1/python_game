@@ -64,22 +64,39 @@ def ball_animation():
     #10. adding logic for bouncing the ball
     #this is for the y axis
     if ball.top <=0 or ball.bottom >= screen_height:
+        pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1 #reversing th e ball speed
     #this is for the x axis  if the ball hits the left or right boundary
     if ball.left<=0:
+         pygame.mixer.Sound.play(score_sound)
          player_score += 1
          #restart_game()
          score_time= pygame.time.get_ticks() #this will tell hpw long it has been since the game got started, this wll be point 1 whch only checks the time once.
        
     if ball.right>=screen_width:
+        pygame.mixer.Sound.play(score_sound)
         #ball_speed_x*=-1 --> this thing was used before when we wanted to reverse the speed only instead of restarting the game
         ##restart_game() #getting rid of the resart function from here so that it dosent get called just once, but gets called multiple times because we want to measure current time 
         opponent_score += 1 #16. updating the game score
         score_time= pygame.time.get_ticks()
 
     #11. checking for collision with the player bars
-    if ball.colliderect(player) or ball.colliderect(opponent):
-        ball_speed_x*=-1 #reversing the x speed
+    #19 turning the collision if's into 2 different if statements , onr for each peddle
+    if ball.colliderect(player) and ball_speed_x>0: #collision has happened with player and ball is moving in the direction of player
+        pygame.mixer.Sound.play(pong_sound)
+        if abs(ball.right-player.left)<10:
+            ball_speed_x*=-1 #reversing the x speed
+        elif abs(ball.bottom-player.top)<10 and ball.y>0:
+            ball_speed_y*=-1
+        elif abs(ball.top-player.bottom)<10 and ball.y<0:
+            ball_speed_y*=-1
+    if ball.colliderect(opponent) and ball_speed_y<0:
+        if abs(ball.left-opponent.right)<10:
+            ball_speed_x*=-1
+        elif abs(ball.bottom-opponent.top)<10 and ball.y>0:
+            ball_speed_y*=-1
+        elif abs(ball.top-opponent.bottom)<10 and ball.y<0:
+            ball_speed_y*=-1
 
 #player animation function declaration and definition
 def player_animation():
@@ -94,10 +111,11 @@ def player_animation():
         player.bottom=screen_height
 
 
-#1. general setup 
+#1. general  setup 
 #these lines are important for the general setup
 # pygame.init() initiates all the pygame modules and is required to run any pygame code
 pygame.init() 
+pygame.mixer.pre_init(44100,-16,2,500)
 clock=pygame.time.Clock()
 
 #2. setting up the main window
@@ -130,6 +148,9 @@ player_speed=0
 #declaring the opponent speed
 opponent_speed=4
 
+#20. sound importing 
+pong_sound=pygame.mixer.Sound("pong.ogg")
+score_sound=pygame.mixer.Sound("score.ogg")
 
 # we want to get the time whenever someone scores because thats when the person needs to start the timer, aftre this moment we need to halt for 3 seconds
 
